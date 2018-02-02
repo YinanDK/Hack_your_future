@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+</head>
+
+<body>
+    <div class="container">
+        <div id="containerFirst" classs="container">
+            <button id="getButton" type="button" onclick="displayData ()"> Get Api</button>
+            <div id="demo"></div>
+        </div>
+        <div id="containerSecond" classs="container">
+            <button id="getLink" type="button" onclick="displayLink ()"> Get Api Link</button>
+            <div id="linkDemo"></div>
+        </div>
+        <div id="containerThird" classs="container">
+            <input type="text" id="inputTest" placeholder="Type in Api name">
+            <button id="getApi" type="button" onclick="apiSearch()"> Search</button>
+            <div id="linkDemo"></div>
+        </div>
+    </div>
+    <!-- <script src="function.js"></script> -->
+    <script type="text/javascript">
+    function displayData() {
+        console.log('you clicked me!');
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("demo").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "https://api.github.com/orgs/HackYourFuture/repos", true);
+        xhttp.send();
+    }
+
+    function displayLink() {
+        var xhttp, xmlDoc, txt, link, url, x, i;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                xmlDoc = this.responseText;
+                link = " ";
+                txt = "https://api.github.com/repos/HackYourFuture/";
+                x = JSON.parse(xmlDoc)
+                for (i = 0; i < x.length; i++) {
+                    url = txt.concat(x[i].name);
+                    link = link + '<a href = " ' + url + ' ">' + x[i].name + '</a> <br>';
+
+
+                }
+                document.getElementById("linkDemo").innerHTML = link;
+            }
+        };
+        xhttp.open("GET", "https://api.github.com/orgs/HackYourFuture/repos", true);
+        xhttp.send();
+    }
+
+    function apiSearch() {
+        var txt, link, textvalue;
+        textvalue = document.getElementById("inputTest").value;
+        txt = "https://api.github.com/repos/HackYourFuture/";
+        link = " ";
+        url = txt.concat(textvalue);
+        window.location.href = url;
+    }
+    </script>
+</body>
+
+</html>
