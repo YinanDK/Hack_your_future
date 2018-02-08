@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+   /* .invisible {
+        display: none;
+    }*/
+    /* Learn how to make your own CSS loader here https://www.w3schools.com/howto/howto_css_loader.asp */
+
+   /* .loader {
+        width: 4em;
+        height: 4em;
+        margin-left: 3em;
+        margin-top: 1em;
+        border-right: 10px solid silver;
+        border-top: 20px solid goldenrod;
+        border-bottom: 20px solid goldenrod;
+        border-left: 10px solid silver;
+        border-radius: 50%;
+        animation: spin 1s ease-in-out infinite;
+    }*/
+
+    /*@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }*/
+    </style>
+</head>
+
+<body>
+
+    <h1>Search for movies by subject</h1>
+    <form>
+        <input type="text" id="user-input-field" required>
+        <button id="searchBtn" type="button">Search</button>
+        <button id="searchCL" type="button">search Command Line</button>
+    </form>
+    <div class="loader invisible" id="resultLoader"></div>
+    <article id="resultEl">
+    </article>
+    <script type="text/javascript">
+    //add a lick event function//
+
+    //get input val function//
+    //send request, load input val//
+    //check if the state is done//
+    //think about how to diaplay//
+
+    const btn = document.getElementById("searchBtn");
+    const btn1 = document.getElementById("searchCL");
+    const url = "https://api.github.com/orgs/HackYourFuture/repos";
+    const url1 = "https://api.github.com/repos/HackYourFuture/CommandLine";
+
+     btn.addEventListener("click", function(){
+         console.log('you clicked me!');
+         var callbackFunction = function(data) {
+            console.log(data);
+            for (let i=0; i<data.length; i++){
+                document.getElementById("resultLoader").innerHTML = data[i].name;
+            }
+                
+            
+            
+        }
+        fetchJsonData(url, callbackFunction);
+
+    })
+
+
+     function fetchJsonData(url, getJsonData) {
+         const request = new XMLHttpRequest();
+    request.addEventListener('load', function() {
+        getJsonData(JSON.parse(request.responseText));
+    });
+
+    request.open('get', url);
+    request.send();
+}
+    
+   
+
+    btn1.addEventListener("click", function(){
+         console.log('you clicked me!');
+         const callbackFunction = function(data) {
+
+            document.getElementById("resultLoader").innerHTML = data.full_name;
+            console.log(data);
+        }
+        fetchJsonData(url1, callbackFunction);
+
+    })
+
+
+    
+   
+    
+
+    
+
+    
+    
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		body{
+			font-size: 24px;
+			text-align: center;
+			background-color: #efefef;
+		}
+		.singleDiv{
+			
+			padding: 100px;
+		}
+
+		#Btn{
+			width: 100px;
+			height: 30px;
+		}
+
+		#array-return{
+			width: 300px;
+			height: 50px;
+			font-size: 14px;
+			text-align: left;
+			margin-top:15px; 
+		}
+	</style>
+</head>
+<body>
+	
+	<div class="singleDiv">
+		<h1>Remove Duplicates Data</h1>
+		['a', 'b', 'c', 'd', 'a', 'e', 'f', 'c']
+		<button id="Btn">Sort</button>
+		<div >
+			<input id="array-return" type="text"  placeholder="After Sorted">
+		</div>
+		
+	</div>
+
+<script type="text/javascript">
+	const Mynum = ['a', 'b', 'c', 'd', 'a', 'e', 'f', 'c'];
+	const btn = document.getElementById("Btn");
+	btn.addEventListener("click",getNewArray);
+	// result= removeDuplicates(Mynum);
+
+	function getNewArray(event) {
+        //Note: we don't need to save the user input to a variable and could just do loadMovies(document.getElementById("user-input-field").value);
+       removeDuplicates(Mynum);
+    }
+
+	function removeDuplicates(num) {
+  let x,
+      len=num.length,
+      result=[],
+      obj={};
+ 
+  for (x=0; x<len; x++) {
+    obj[num[x]]=0;
+  };
+  for (x in obj) {
+    result.push(x);
+
+  };
+  
+  console.log(result);
+  display(result);
+}
+
+
+function display (x){
+	document.getElementById("array-return").value= x;
+}
+/*
+	console.log(Mynum);*/
+	
+	
+	
+</script>
+</body>
+</html>

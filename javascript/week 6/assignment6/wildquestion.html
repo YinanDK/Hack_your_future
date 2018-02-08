@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+    body {
+        text-align: center;
+        background-color: #efefef;
+    }   
+
+    h1 {
+        font-size: 42px;
+    }
+
+   /* .navigation-list {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #333;
+    }
+    .logo{
+        width: 100px;
+    }
+
+    .list-item {
+        float: left;
+    }
+
+    .menu{
+        display: inline-block;
+        color: white;
+        text-align: center;
+        padding: 0px 16px;
+        text-decoration: none;
+        line-height: 100px;
+    }
+
+    .menu:hover{
+        background-color: #737373;
+        text-decoration: underline;
+    }
+*/  #answer-wild{
+    padding: 150px 40px;
+}
+    .api-search-form {
+        padding: 10px 40px;
+    }
+
+    #user-input-field {
+        width: 530px;
+        height: 50px;
+        border-color: #EBD96D;
+        border-width: 1px;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    #searchBtn {
+        width: 100px;
+        height: 53px;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    .loader {
+
+        width: 3em;
+        height: 3em;
+        margin-left: 50%;
+        margin-top: 1em;
+        border-right: 10px solid silver;
+        border-top: 20px solid goldenrod;
+        border-bottom: 20px solid goldenrod;
+        border-left: 10px solid silver;
+        border-radius: 50%;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    table {
+        text-align: left;
+    }
+
+    
+    .person{
+        width: 40px;
+    }
+    .fork-list{
+      list-style-type: none;  
+      padding: 20 30px; 
+      line-height: 50px;
+    }
+
+    </style>
+</head>
+
+<body>
+   <!--  <header>
+
+        <div class="header">
+            <nav class="navigation">
+                <ul class="navigation-list">
+                    <li class="list-item"><a href="#home"><img class="logo" src="https://avatars0.githubusercontent.com/u/29845045?v=4"></a></li>;
+                    <li class="list-item"><a class="menu" href="#home">Answer(1-10)</a></li>;
+                    <li class="list-item"><a class="menu" href="#home">Go Wild</a></li>;
+                </ul>
+            </nav>
+        </div>
+    </header> -->
+
+<!--     <div id="answer-before10">
+        <h1>Search for javascript Api from Github</h1>
+        <form class="api-search-form">
+            <input type="text" id="user-input-field" placeholder="Type in full-name of Api">
+            <button id="searchBtn" type="button">Search</button>
+        </form>
+        <div class="loader invisible" id="resultLoader"></div>
+        <article id="resultEl">
+        </article>
+    </div> -->
+
+      <div id="answer-wild">
+        <h1>Search for who are your classmates</h1>
+        <form class="api-search-form">
+            <input type="text" id="user-input-field" placeholder="Type in class name">
+            <button id="searchBtn" type="button">Search</button>
+        </form>
+        <div class="loader invisible" id="resultLoader"></div>
+        <div class="result-fork">
+        <article id="resultEl">
+
+        </article>
+        </div>
+    </div>
+    <script type="text/javascript">
+    "use strict";
+    //Set up global vars
+    const resultEl = document.querySelector("#resultEl"); //this is slower than getElementById
+    const btnEl = document.getElementById("searchBtn");
+    const loaderEl = document.getElementById("resultLoader");
+
+    btnEl.addEventListener("click", getUserInput);
+
+    //User input gathers the value from the input field and calls loadMovies
+    function getUserInput(event) {
+        //Note: we don't need to save the user input to a variable and could just do loadMovies(document.getElementById("user-input-field").value);
+        var userInput = document.getElementById("user-input-field").value;
+        if (userInput == "") {
+            alert("Input is empty!");
+        } else {
+
+            console.log("User typed in: " + userInput);
+            fetchData(userInput);
+
+        }
+    }
+
+    //This function will request a list of movies with the word "searchTerm" in the title from the open movie database
+    function fetchData(searchTerm) {
+        //console.log(loaderEl);
+        loaderEl.classList.toggle("invisible");
+        //console.log("retrieving movie data request");
+        var requestURL = 'https://api.github.com/repos/HackYourFuture-CPH/' + searchTerm;
+
+
+        var results = [];
+        //Build an XHR request and then send it.
+        //If you want a more structured approach, write an XHR constructor and call it here
+        //Read this for more info: https://www.kirupa.com/html5/making_http_requests_js.htm
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = makeRequest;
+
+        function makeRequest() {
+            console.log(xhr.readyState);
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                console.log("xhr request DONE SON");
+                //console.log(xhr.response);
+                //The result of the XHR will be a string that we need to turn into JSON
+                var results = JSON.parse(xhr.response);
+                console.log(results);
+                renderDOM(results, searchTerm);
+            }
+            //TODO: add error handling
+            else {
+                console.log("xhr request send unsucessefully!")
+            }
+        }
+        xhr.open('GET', requestURL);
+        xhr.send();
+    }
+    //This function wil render the ovie information once it has been loaded
+    function renderDOM(data, searchTerm) {
+        loaderEl.classList.toggle("invisible");
+        console.log("Rendering results");
+        var article = document.querySelector("article");
+        article.innerHTML = "";
+        fetchForks(article, data.name, data.name);
+    }
+
+    function fetchForks(article, name, searchTerm) {
+
+        var requestURL = 'https://api.github.com/repos/HackYourFuture-CPH/' + searchTerm + '/forks';
+
+
+        var results = [];
+        //Build an XHR request and then send it.
+        //If you want a more structured approach, write an XHR constructor and call it here
+        //Read this for more info: https://www.kirupa.com/html5/making_http_requests_js.htm
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', requestURL, true);
+        xhr.send();
+
+        var personInf = "";
+
+        xhr.onreadystatechange = makeRequest;
+
+        function makeRequest() {
+            console.log(xhr.readyState);
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                console.log("xhr request DONE SON");
+                //console.log(xhr.response);
+                //The result of the XHR will be a string that we need to turn into JSON
+                var results = JSON.parse(xhr.response);
+                console.log(results);
+                for (let i = 0; i < results.length; i++) {
+                
+                    personInf = personInf + '<li class = "fork-list" >' + '<img class = "person" src="' + results[i].owner.avatar_url + '">'+ '&nbsp;'+ 
+                    '&nbsp;'+ results[i].owner.login + '&nbsp;'+ '&nbsp;'+
+                     '<a href="'+ results[i].owner.html_url + '">GithubLink</a>' + '</li>';
+                    // console.log(login);
+                }
+
+                createSection(article, name, personInf )
+                
+            }
+
+
+            //TODO: add error handling
+            else {
+                console.log("xhr request send unsucessefully!")
+            }
+        }
+
+
+    } //call back function, make sure when it is wrong, it will work again
+    function createSection(article, name, personInf ) {
+        var section = document.createElement('section');
+        var head = document.createElement('h2');
+        var span1= document.createElement('span');
+        var span2= document.createElement('span');
+        // head.innerHTML = jsonData.name;
+        // span.innerHTML = jsonData.contributors_url ;
+
+        span1.innerHTML = '<b> CLASSNAME: </b>' + name;
+        head.innerHTML = 'Forks:'; 
+        span2.innerHTML = '<ul>'+ personInf + '</ul>';
+        section.appendChild(span1);
+        section.appendChild(head);
+        section.appendChild(span2);
+        article.appendChild(section);
+    }
+
+    //This function keeps track of changes to the xhr request
+    </script>
+</body>
+
+</html>

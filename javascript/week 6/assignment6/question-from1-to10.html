@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+    body {
+        text-align: center;
+        background-color: #efefef;
+    }
+
+    h1 {
+        font-size: 42px;
+    }
+
+    #answer-before10{
+    padding: 150px 40px;
+}
+    .api-search-form {
+        padding: 10px 40px;
+    }
+
+    #user-input-field {
+        width: 500px;
+        height: 30px;
+        border-color: #EBD96D;
+        border-width: 1px;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    #searchBtn {
+        width: 100px;
+        height: 33px;
+        border-radius: 5px;
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    .loader {
+
+        width: 3em;
+        height: 3em;
+        margin-left: 50%;
+        margin-top: 1em;
+        border-right: 10px solid silver;
+        border-top: 20px solid goldenrod;
+        border-bottom: 20px solid goldenrod;
+        border-left: 10px solid silver;
+        border-radius: 50%;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    table {
+        text-align: left;
+    }
+    </style>
+</head>
+
+<body>
+
+    <div id="answer-before10">
+        <h1>Search for repository Api from Github</h1>
+        <form class="api-search-form">
+            <input type="text" id="user-input-field" placeholder="Type in full-name of Api">
+            <button id="searchBtn" type="button">Search</button>
+        </form>
+        <div class="loader invisible" id="resultLoader"></div>
+        <article id="resultEl">
+        </article>
+    </div>
+
+
+    <script type="text/javascript">
+    "use strict";
+    //Set up global vars
+    const resultEl = document.querySelector("#resultEl"); //this is slower than getElementById
+    const btnEl = document.getElementById("searchBtn");
+    const loaderEl = document.getElementById("resultLoader");
+
+    btnEl.addEventListener("click", getUserInput);
+
+    //User input gathers the value from the input field and calls loadMovies
+    function getUserInput(event) {
+        //Note: we don't need to save the user input to a variable and could just do loadMovies(document.getElementById("user-input-field").value);
+        var userInput = document.getElementById("user-input-field").value;
+        if (userInput == "") {
+            alert("Input is empty!");
+        } else {
+
+            console.log("User typed in: " + userInput);
+            fetchData(userInput);
+
+        }
+    }
+
+    //This function will request a list of movies with the word "searchTerm" in the title from the open movie database
+    function fetchData(searchTerm) {
+        //console.log(loaderEl);
+        loaderEl.classList.toggle("invisible");
+        //console.log("retrieving movie data request");
+        var requestURL = 'https://api.github.com/search/repositories?q=user:HackYourFuture+' + searchTerm;
+
+
+        var results = [];
+        //Build an XHR request and then send it.
+        //If you want a more structured approach, write an XHR constructor and call it here
+        //Read this for more info: https://www.kirupa.com/html5/making_http_requests_js.htm
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = makeRequest;
+
+        function makeRequest() {
+            console.log(xhr.readyState);
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                console.log("xhr request DONE SON");
+                //console.log(xhr.response);
+                //The result of the XHR will be a string that we need to turn into JSON
+                var result = JSON.parse(xhr.response);
+                results = result.items;
+                console.log(results);
+                renderDOM(results, searchTerm);
+            }
+            //TODO: add error handling
+            else {
+                console.log("xhr request send unsucessefully!")
+            }
+        }
+        xhr.open('GET', requestURL);
+        xhr.send();
+    }
+    //This function wil render the ovie information once it has been loaded
+    function renderDOM(data, searchTerm) {
+        loaderEl.classList.toggle("invisible");
+        console.log("Rendering results");
+        var article = document.querySelector("article");
+        article.innerHTML = "";
+        data.forEach(function(jsonData) {
+            fetchContributor(article, jsonData.name, jsonData.name);
+        });
+    }
+
+    function fetchContributor(article, name, searchTerm) {
+
+        var requestURL = 'https://api.github.com/repos/HackYourFuture/' + searchTerm + '/contributors';
+
+
+        var results = [];
+        //Build an XHR request and then send it.
+        //If you want a more structured approach, write an XHR constructor and call it here
+        //Read this for more info: https://www.kirupa.com/html5/making_http_requests_js.htm
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', requestURL, true);
+        xhr.send();
+
+        var contributers = "";
+
+        xhr.onreadystatechange = makeRequest;
+
+        function makeRequest() {
+            console.log(xhr.readyState);
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                console.log("xhr request DONE SON");
+                //console.log(xhr.response);
+                //The result of the XHR will be a string that we need to turn into JSON
+                var result = JSON.parse(xhr.response);
+                for (let i = 0; i < result.length; i++) {
+                    contributers = contributers + " " + (i+1) + ',' + result[i].login;
+                }
+
+                createSection(article, name, contributers)
+                console.log(contributers);
+            }
+
+
+            //TODO: add error handling
+            else {
+                console.log("xhr request send unsucessefully!")
+            }
+        }
+
+
+    } //call back function, make sure when it is wrong, it will work again
+    function createSection(article, name, login) {
+        var section = document.createElement('section');
+        // var head = document.createElement('h2');
+        // var span = document.createElement('span');
+        // head.innerHTML = jsonData.name;
+        // span.innerHTML = jsonData.contributors_url ;
+
+        section.innerHTML = '<table> <tr> <th>' + 'Name:' + '</th> <td>' + name + ' </td> </tr> <tr> <th>' + 'contributers:' + '</th> <td>' + login  + '</td> </tr> </table>';
+
+        // section.appendChild(title);
+        // section.appendChild(span);
+        article.appendChild(section);
+    }
+
+    //This function keeps track of changes to the xhr request
+    </script>
+</body>
+
+</html>
